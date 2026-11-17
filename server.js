@@ -155,7 +155,7 @@ function parseConfigFile(filePath) {
   }
 }
 
-function parseJsConfigFile(filePath) {
+function parseJsConfigFile(filePath, baseConfig = {}) {
   if (!fs.existsSync(filePath)) {
     return null;
   }
@@ -165,7 +165,7 @@ function parseJsConfigFile(filePath) {
     const loaded = require(filePath);
     const config = loaded && loaded.default ? loaded.default : loaded;
     if (typeof config === 'function') {
-      return config({ config: {} });
+      return config({ config: baseConfig });
     }
     return config;
   } catch (error) {
@@ -190,26 +190,40 @@ function parseJsConfigFile(filePath) {
 }
 function detectConfig(projectRoot) {
   const jsonCandidates = ['app.json', 'app.config.json'];
+  let baseJsonParsed = null;
+  let baseJsonPath = null;
+  let baseJsonName = null;
 
   for (const name of jsonCandidates) {
     const filePath = path.join(projectRoot, name);
     const parsed = parseConfigFile(filePath);
     if (parsed) {
+      baseJsonParsed = parsed;
+      baseJsonPath = filePath;
+      baseJsonName = name;
+      break;
+    }
+  }
+
+  // If app.config.js exists, it takes precedence in Expo projects (dynamic config)
+  const jsConfigPath = path.join(projectRoot, 'app.config.js');
+  if (fs.existsSync(jsConfigPath)) {
+    const baseConfig = baseJsonParsed && baseJsonParsed.expo ? baseJsonParsed.expo : (baseJsonParsed || {});
+    const parsedJsConfig = parseJsConfigFile(jsConfigPath, baseConfig);
+    if (parsedJsConfig) {
       return {
-        configPath: filePath,
-        configName: name,
-        raw: parsed,
+        configPath: jsConfigPath,
+        configName: 'app.config.js',
+        raw: parsedJsConfig,
       };
     }
   }
 
-  const jsConfigPath = path.join(projectRoot, 'app.config.js');
-  const parsedJsConfig = parseJsConfigFile(jsConfigPath);
-  if (parsedJsConfig) {
+  if (baseJsonParsed) {
     return {
-      configPath: jsConfigPath,
-      configName: 'app.config.js',
-      raw: parsedJsConfig,
+      configPath: baseJsonPath,
+      configName: baseJsonName,
+      raw: baseJsonParsed,
     };
   }
 
@@ -296,24 +310,119 @@ function resolveAsset(projectRoot, relativePath) {
   };
 }
 
+function findFallbackAsset(projectRoot, candidates) {
+  for (const rel of candidates) {
+    const resolved = safeProjectAsset(projectRoot, rel);
+    if (resolved && fs.existsSync(resolved) && fs.statSync(resolved).isFile()) {
+      return {
+        path: resolved,
+        relative: path.relative(projectRoot, resolved).replace(/\\/g, '/'),
+        placeholder: false,
+        missing: false,
+      };
+    }
+  }
+  return null;
+}
+
 function buildState(projectRoot) {
   ensurePlaceholderAsset();
   const detected = detectConfig(projectRoot);
   const rawConfig = detected.raw && !detected.raw.__error ? detected.raw : {};
-  const expo = rawConfig.expo || {};
+  const expo = (rawConfig && rawConfig.expo) || rawConfig || {};
   const android = expo.android || {};
   const adaptiveIcon = android.adaptiveIcon || {};
-  const splash = expo.splash || {};
+  let splashPluginConfig = {};
+  if (Array.isArray(expo.plugins)) {
+    for (const plugin of expo.plugins) {
+      if (Array.isArray(plugin) && plugin[0] === 'expo-splash-screen' && typeof plugin[1] === 'object') {
+        splashPluginConfig = plugin[1];
+        break;
+      }
+    }
+  }
+  const splash = { ...splashPluginConfig, ...(expo.splash || {}) };
   const splashDark = splash.dark || {};
 
-  const iconAsset = resolveAsset(projectRoot, adaptiveIcon.foregroundImage || expo.icon);
-  const iosIconAsset = resolveAsset(projectRoot, expo.icon);
-  const splashAsset = resolveAsset(projectRoot, splash.image);
-  const splashDarkAsset = resolveAsset(projectRoot, splashDark.image || splash.image);
+  let iconAsset = resolveAsset(projectRoot, adaptiveIcon.foregroundImage || expo.icon);
+  let iosIconAsset = resolveAsset(projectRoot, expo.icon);
+  let splashAsset = resolveAsset(projectRoot, splash.image);
+  let splashDarkAsset = resolveAsset(projectRoot, splashDark.image || splash.image);
+
+  let usedFallback = false;
+  if (iconAsset.placeholder) {
+    const fallback = findFallbackAsset(projectRoot, [
+      'icon_output/android/mipmap-xxxhdpi/ic_launcher_foreground.png',
+      'android/mipmap-xxxhdpi/ic_launcher_foreground.png',
+      'icon_output/android/mipmap-xxhdpi/ic_launcher_foreground.png',
+      'android/mipmap-xxhdpi/ic_launcher_foreground.png',
+      'icon_output/android/play-store/play_store_icon.png',
+      'android/play-store/play_store_icon.png',
+      'assets/adaptive-icon.png',
+      'assets/iconpeek.png',
+      'assets/icon.png',
+      'adaptive-icon.png',
+      'iconpeek.png',
+      'icon.png',
+    ]);
+    if (fallback) {
+      iconAsset = fallback;
+      usedFallback = true;
+    }
+  }
+
+  if (iosIconAsset.placeholder) {
+    const fallback = findFallbackAsset(projectRoot, [
+      'icon_output/ios/AppIcon.appiconset/icon_ios-marketing_1024x1024@1x.png',
+      'ios/AppIcon.appiconset/icon_ios-marketing_1024x1024@1x.png',
+      'icon_output/android/play-store/play_store_icon.png',
+      'android/play-store/play_store_icon.png',
+      'assets/iconpeek.png',
+      'assets/icon.png',
+      'iconpeek.png',
+      'icon.png',
+    ]);
+    if (fallback) {
+      iosIconAsset = fallback;
+      usedFallback = true;
+    }
+  }
+
+  if (splashAsset.placeholder) {
+    const fallback = findFallbackAsset(projectRoot, [
+      'assets/splash.png',
+      'assets/splash-icon.png',
+      'assets/iconpeek.png',
+      'splash.png',
+      'icon_output/android/play-store/play_store_icon.png',
+      'android/play-store/play_store_icon.png',
+    ]);
+    if (fallback) {
+      splashAsset = fallback;
+      usedFallback = true;
+    }
+  }
+
+  if (splashDarkAsset.placeholder) {
+    const fallback = findFallbackAsset(projectRoot, [
+      'assets/splash-dark.png',
+      'splash-dark.png',
+      'assets/splash.png',
+      'assets/iconpeek.png',
+    ]);
+    if (fallback) {
+      splashDarkAsset = fallback;
+      usedFallback = true;
+    }
+  }
 
   const warningMessages = [];
   if (!detected.configPath) {
-    warningMessages.push('No app.json, app.config.json, or app.config.js found. Showing placeholder assets and default colors.');
+    if (usedFallback) {
+      warningMessages.push('No app.json, app.config.json, or app.config.js found. Using assets found in icon_output / assets.');
+    } else {
+      warningMessages.push('No app.json, app.config.json, or app.config.js found. Showing placeholder assets and default colors.');
+    }
   }
   if (detected.raw && detected.raw.__error) {
     warningMessages.push(detected.raw.__error);
@@ -452,6 +561,43 @@ function createServer(options) {
         }
       });
       return;
+    }
+
+    if (requestUrl.pathname === '/bundle.js') {
+      const bundlePath = path.join(__dirname, 'dist', 'bundle.js');
+      if (fs.existsSync(bundlePath)) {
+        res.writeHead(200, {
+          'Content-Type': 'application/javascript; charset=utf-8',
+          'Cache-Control': 'no-store',
+        });
+        fs.createReadStream(bundlePath).pipe(res);
+        return;
+      }
+    }
+
+    if (requestUrl.pathname === '/assets/iconpeek.png' || requestUrl.pathname === '/favicon.ico') {
+      const filePath = path.join(__dirname, 'assets', 'iconpeek.png');
+      if (fs.existsSync(filePath)) {
+        res.writeHead(200, {
+          'Content-Type': 'image/png',
+          'Cache-Control': 'public, max-age=86400',
+        });
+        fs.createReadStream(filePath).pipe(res);
+        return;
+      }
+    }
+
+    if (requestUrl.pathname.startsWith('/assets/mockups/')) {
+      const fileName = path.basename(requestUrl.pathname);
+      const filePath = path.join(__dirname, 'assets', 'mockups', fileName);
+      if (fs.existsSync(filePath)) {
+        res.writeHead(200, {
+          'Content-Type': 'image/webp',
+          'Cache-Control': 'public, max-age=86400',
+        });
+        fs.createReadStream(filePath).pipe(res);
+        return;
+      }
     }
 
     if (requestUrl.pathname === '/assets/icon') {

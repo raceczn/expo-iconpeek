@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "IconPeek",
+    "slug": "expo-iconpeek",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./icon_output/ios/AppIcon.appiconset/icon_ios-marketing_1024x1024@1x.png",
+    "userInterfaceStyle": "light",
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/iconpeek.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#0E1015"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./icon_output/android/mipmap-xxxhdpi/ic_launcher_foreground.png",
+        "backgroundColor": "#0E1015"
+      }
+    }
+  }
+}

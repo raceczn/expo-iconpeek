@@ -2,6 +2,7 @@ import argparse
 import base64
 import io
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -80,6 +81,20 @@ def ensure_source_image(source_value):
 
 
 def open_image(path_value):
+    path = Path(path_value)
+    if path.suffix.lower() == ".svg":
+        try:
+            content = path.read_text(encoding="utf-8")
+            match = re.search(r'data:image/(?:png|jpeg|webp);base64,([A-Za-z0-9+/=]+)', content)
+            if match:
+                data = base64.b64decode(match.group(1))
+                return Image.open(io.BytesIO(data)).convert("RGBA")
+        except Exception:
+            pass
+        raise ValueError(
+            f"SVG vector format is not supported directly by Pillow unless it contains an embedded raster image: {path_value}. "
+            "Please convert the SVG to a PNG (e.g., 1024x1024) first."
+        )
     return Image.open(path_value).convert("RGBA")
 
 

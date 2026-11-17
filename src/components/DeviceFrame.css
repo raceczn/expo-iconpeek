@@ -1,0 +1,464 @@
+/* Premium Studio & Device Frame Styles */
+
+:root {
+  --studio-bg: #0b0d11;
+  --studio-surface: #14171f;
+  --studio-surface-elevated: #1c202b;
+  --studio-border: rgba(255, 255, 255, 0.08);
+  --studio-border-hover: rgba(255, 255, 255, 0.16);
+  --studio-text: #f0f3f8;
+  --studio-text-secondary: #8c96a8;
+  --studio-text-muted: #596375;
+  --accent-primary: #3b82f6;
+  --accent-primary-hover: #2563eb;
+  --accent-glow: rgba(59, 130, 246, 0.35);
+  --accent-ios: #007aff;
+  --accent-android: #3ddc84;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+}
+
+/* Studio Canvas Backgrounds */
+.wallpaper-deep-space {
+  background: radial-gradient(circle at 50% 20%, #1e2640 0%, #0d111a 60%, #06080d 100%);
+}
+
+.wallpaper-titanium {
+  background: radial-gradient(circle at 50% 30%, #252830 0%, #14161c 55%, #0a0b0e 100%);
+}
+
+.wallpaper-sunset {
+  background: radial-gradient(circle at 30% 20%, #3a1c3d 0%, #171126 50%, #080612 100%);
+}
+
+.wallpaper-minimal-dark {
+  background: #090a0d;
+}
+
+.wallpaper-studio-grid {
+  background-color: #0b0d12;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* Light Wallpaper Canvas Themes */
+.wallpaper-light-studio {
+  background: radial-gradient(circle at 50% 10%, #ffffff 0%, #f1f5f9 60%, #e2e8f0 100%);
+}
+
+.wallpaper-light-silver {
+  background: radial-gradient(circle at 50% 25%, #f8fafc 0%, #eef2f6 50%, #dfe4ea 100%);
+}
+
+.wallpaper-light-sunset {
+  background: radial-gradient(circle at 30% 20%, #ffe4e6 0%, #fdf2f8 40%, #f1f5f9 100%);
+}
+
+.wallpaper-light-grid {
+  background-color: #f8fafc;
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.06) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+/* Light Theme Studio Chassis Shadow */
+.theme-light .iphone-chassis,
+.theme-light .galaxy-chassis {
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.2),
+    0 0 0 4px #23252a,
+    0 0 0 6px #41444c,
+    0 24px 60px -10px rgba(15, 23, 42, 0.28),
+    0 40px 100px -20px rgba(15, 23, 42, 0.2);
+}
+
+/* ============================================================
+   Iphone (IOS) CHASSIS
+   ============================================================ */
+.iphone-chassis {
+  position: relative;
+  width: 375px;
+  height: 770px;
+  border-radius: 52px;
+  background: #000000;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 0 4px #1c1d21,
+    0 0 0 6px #373940,
+    0 24px 64px -12px rgba(0, 0, 0, 0.8),
+    0 40px 100px -20px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+/* Hardware buttons on iPhone */
+.iphone-action-btn {
+  position: absolute;
+  left: -9px;
+  top: 108px;
+  width: 4px;
+  height: 28px;
+  background: #2b2d33;
+  border-radius: 3px 0 0 3px;
+}
+
+.iphone-vol-up {
+  position: absolute;
+  left: -9px;
+  top: 154px;
+  width: 4px;
+  height: 52px;
+  background: #2b2d33;
+  border-radius: 3px 0 0 3px;
+}
+
+.iphone-vol-down {
+  position: absolute;
+  left: -9px;
+  top: 218px;
+  width: 4px;
+  height: 52px;
+  background: #2b2d33;
+  border-radius: 3px 0 0 3px;
+}
+
+.iphone-power-btn {
+  position: absolute;
+  right: -9px;
+  top: 168px;
+  width: 4px;
+  height: 76px;
+  background: #2b2d33;
+  border-radius: 0 3px 3px 0;
+}
+
+/* iPhone Screen Container */
+.iphone-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 48px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+}
+
+/* Dynamic Island */
+.dynamic-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 122px;
+  height: 33px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  box-shadow: 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dynamic-island-lens {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #1c355e 0%, #0d1624 50%, #000000 100%);
+  box-shadow: inset 0 0 1px 1px rgba(70, 130, 200, 0.4);
+}
+
+.dynamic-island-sensor {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #0e121a 0%, #000000 100%);
+  opacity: 0.8;
+}
+
+/* iOS Status Bar */
+.ios-status-bar {
+  height: 48px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 28px 0 28px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+  z-index: 50;
+  letter-spacing: -0.2px;
+}
+
+/* iOS Home Indicator */
+.ios-home-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 134px;
+  height: 4.5px;
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 10px;
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.ios-home-bar:hover {
+  background: #ffffff;
+  transform: translateX(-50%) scaleY(1.3);
+}
+
+/* iOS Dock */
+.ios-dock {
+  position: absolute;
+  bottom: 24px;
+  left: 14px;
+  right: 14px;
+  height: 84px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 0 0.5px rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================================
+   SAMSUNG GALAXY S24 ULTRA CHASSIS
+   ============================================================ */
+.galaxy-chassis {
+  position: relative;
+  width: 375px;
+  height: 770px;
+  border-radius: 26px;
+  background: #000000;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.15),
+    0 0 0 4px #1e2024,
+    0 0 0 6px #3b3e45,
+    0 24px 64px -12px rgba(0, 0, 0, 0.8),
+    0 40px 100px -20px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease;
+}
+
+/* Samsung Buttons on Right */
+.galaxy-vol-rocker {
+  position: absolute;
+  right: -9px;
+  top: 140px;
+  width: 4px;
+  height: 80px;
+  background: #2f3238;
+  border-radius: 0 3px 3px 0;
+}
+
+.galaxy-power-btn {
+  position: absolute;
+  right: -9px;
+  top: 242px;
+  width: 4px;
+  height: 48px;
+  background: #2f3238;
+  border-radius: 0 3px 3px 0;
+}
+
+/* Samsung Screen */
+.galaxy-screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #000000;
+}
+
+/* Samsung Punch-hole Front Camera */
+.galaxy-punch-hole {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #18283d 0%, #090f17 50%, #000000 100%);
+  box-shadow: inset 0 0 1px 1px rgba(50, 140, 255, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.8);
+  z-index: 100;
+}
+
+/* One UI Status Bar */
+.galaxy-status-bar {
+  height: 40px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 20px 0 20px;
+  font-family: "Roboto", system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #ffffff;
+  z-index: 50;
+  letter-spacing: 0.1px;
+}
+
+/* Android Gesture Bar */
+.galaxy-gesture-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.2s ease;
+}
+
+.galaxy-gesture-bar:hover {
+  background: #ffffff;
+  transform: translateX(-50%) scaleY(1.3);
+}
+
+/* Google Pill Search Bar Widget */
+.google-search-widget {
+  width: 100%;
+  height: 46px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 0 0 0.5px rgba(255, 255, 255, 0.2);
+}
+
+/* Android Dock */
+.galaxy-dock {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 16px;
+}
+
+/* ============================================================
+   APP ICONS & MASKS
+   ============================================================ */
+
+/* iOS continuous squircle curvature */
+.ios-squircle {
+  border-radius: 22.5%;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
+}
+
+/* Android Mask Shapes */
+.mask-squircle {
+  border-radius: 28%;
+}
+
+.mask-circle {
+  border-radius: 50%;
+}
+
+.mask-rounded-rect {
+  border-radius: 18%;
+}
+
+.mask-square {
+  border-radius: 0%;
+}
+
+.mask-teardrop {
+  border-radius: 50% 50% 50% 8%;
+}
+
+/* Active Highlight Ring for User App */
+.app-highlight-ring {
+  position: relative;
+}
+
+.app-highlight-ring::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid #3b82f6;
+  box-shadow: 0 0 12px rgba(59, 130, 246, 0.6);
+  pointer-events: none;
+  animation: pulse-ring 2.5s infinite;
+}
+
+@keyframes pulse-ring {
+
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(1.05);
+  }
+}
+
+/* App icon click feedback */
+.interactive-icon:active {
+  transform: scale(0.92);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
