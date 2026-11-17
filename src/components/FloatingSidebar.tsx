@@ -14,7 +14,8 @@ import {
   AlertTriangle,
   MonitorCheck,
   Columns2,
-  Palette
+  Palette,
+  X
 } from 'lucide-react';
 import { ViewMode, DeviceLayout, WallpaperTheme, StudioTheme, ExpoState } from '../types';
 
@@ -30,6 +31,8 @@ interface FloatingSidebarProps {
   setIsSplashDark: (dark: boolean) => void;
   studioTheme: StudioTheme;
   setStudioTheme: (theme: StudioTheme) => void;
+  isMobileOpen?: boolean;
+  onCloseMobile?: () => void;
 }
 
 export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
@@ -44,9 +47,21 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
   setIsSplashDark,
   studioTheme,
   setStudioTheme,
+  isMobileOpen = false,
+  onCloseMobile,
 }) => {
   const isLight = studioTheme === 'light';
   const hasWarnings = state.warnings && state.warnings.length > 0;
+
+  const handleViewSelect = (mode: ViewMode) => {
+    setViewMode(mode);
+    onCloseMobile?.();
+  };
+
+  const handleDeviceSelect = (layout: DeviceLayout) => {
+    setDeviceLayout(layout);
+    onCloseMobile?.();
+  };
 
   const toggleStudioTheme = () => {
     setStudioTheme(isLight ? 'dark' : 'light');
@@ -60,72 +75,99 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
   ];
 
   return (
-    <aside
-      className={`fixed left-5 top-5 bottom-5 w-[252px] rounded-3xl z-50 flex flex-col justify-between p-4 select-none transition-all duration-300 ${isLight
-          ? 'bg-white/80 backdrop-blur-2xl border border-black/[0.08] shadow-[0_20px_50px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] text-slate-800'
-          : 'bg-[#0f1219]/80 backdrop-blur-2xl border border-white/[0.09] shadow-[0_24px_64px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.12)] text-white'
-        }`}
-    >
-      {/* Top Half: Brand & Navigation */}
-      <div className="flex flex-col gap-5">
-        {/* App Branding Pill */}
-        <div className={`p-3 rounded-2xl flex items-center gap-3 transition-colors ${isLight ? 'bg-slate-100/70 border border-slate-200/60' : 'bg-white/[0.03] border border-white/[0.06]'
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isMobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden transition-opacity"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <aside
+        className={`fixed z-50 flex flex-col justify-between p-4 select-none transition-all duration-300
+          top-0 bottom-0 left-0 w-[280px] max-w-[85vw] rounded-r-3xl md:rounded-3xl
+          md:top-5 md:bottom-5 md:left-5 md:w-[252px]
+          ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'}
+          ${isLight
+            ? 'bg-white/95 md:bg-white/80 backdrop-blur-2xl border-r md:border border-black/[0.08] shadow-[0_20px_50px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.9)] text-slate-800'
+            : 'bg-[#0f1219]/95 md:bg-[#0f1219]/80 backdrop-blur-2xl border-r md:border border-white/[0.09] shadow-[0_24px_64px_rgba(0,0,0,0.7),inset_0_1px_0_rgba(255,255,255,0.12)] text-white'
+          }`}
+      >
+        {/* Top Half: Brand & Navigation */}
+        <div className="flex flex-col gap-5 overflow-y-auto">
+          {/* App Branding Pill & Mobile Close Button */}
+          <div className={`p-3 rounded-2xl flex items-center justify-between gap-3 transition-colors ${
+            isLight ? 'bg-slate-100/70 border border-slate-200/60' : 'bg-white/[0.03] border border-white/[0.06]'
           }`}>
-          <img 
-            src="/assets/iconpeek.png" 
-            alt="iconpeek" 
-            className="w-10 h-10 object-contain select-none shrink-0 drop-shadow-sm" 
-          />
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5">
-              <span className={`font-bold text-sm tracking-tight truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
-                iconpeek
-              </span>
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <div className="flex items-center gap-3 min-w-0 flex-1">
+              <img 
+                src="/assets/iconpeek.png" 
+                alt="iconpeek" 
+                className="w-10 h-10 object-contain select-none shrink-0 drop-shadow-sm" 
+              />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className={`font-bold text-sm tracking-tight truncate ${isLight ? 'text-slate-900' : 'text-white'}`}>
+                    iconpeek
+                  </span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                </div>
+                <div className={`text-[11px] truncate flex items-center gap-1 font-mono ${isLight ? 'text-slate-500' : 'text-slate-400'}`} title={state.projectRoot}>
+                  <span className="truncate">{state.expo.name || 'Expo App'}</span>
+                </div>
+              </div>
             </div>
-            <div className={`text-[11px] truncate flex items-center gap-1 font-mono ${isLight ? 'text-slate-500' : 'text-slate-400'}`} title={state.projectRoot}>
-              <span className="truncate">{state.expo.name || 'Expo App'}</span>
-            </div>
-          </div>
-        </div>
 
-        {/* SECTION 1: View Modes */}
-        <div className="flex flex-col gap-1.5">
-          <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
-            Views
-          </span>
-          <div className="flex flex-col gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = viewMode === item.mode;
-              return (
-                <button
-                  key={item.mode}
-                  onClick={() => setViewMode(item.mode)}
-                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 font-semibold'
-                      : isLight
-                        ? 'text-slate-600 hover:text-slate-900 hover:bg-black/[0.04]'
-                        : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
-                    }`}
-                >
-                  <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : isLight ? 'text-slate-500' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* SECTION 2: Device Layout Switcher */}
-        <div className="flex flex-col gap-1.5">
-          <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
-            Emulators
-          </span>
-          <div className={`p-1 rounded-xl flex flex-col gap-1 border ${isLight ? 'bg-slate-100/70 border-slate-200/60' : 'bg-white/[0.03] border-white/[0.06]'
-            }`}>
+            {/* Mobile Close Button */}
             <button
-              onClick={() => setDeviceLayout('both')}
+              onClick={onCloseMobile}
+              className={`md:hidden p-1.5 rounded-xl transition-colors ${
+                isLight ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/60' : 'text-slate-400 hover:text-white hover:bg-white/10'
+              }`}
+              aria-label="Close menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* SECTION 1: View Modes */}
+          <div className="flex flex-col gap-1.5">
+            <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+              Views
+            </span>
+            <div className="flex flex-col gap-1">
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = viewMode === item.mode;
+                return (
+                  <button
+                    key={item.mode}
+                    onClick={() => handleViewSelect(item.mode)}
+                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${isActive
+                        ? 'bg-blue-600 text-white shadow-md shadow-blue-500/25 font-semibold'
+                        : isLight
+                          ? 'text-slate-600 hover:text-slate-900 hover:bg-black/[0.04]'
+                          : 'text-slate-400 hover:text-white hover:bg-white/[0.04]'
+                      }`}
+                  >
+                    <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-white' : isLight ? 'text-slate-500' : 'text-slate-400'}`} />
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* SECTION 2: Device Layout Switcher */}
+          <div className="flex flex-col gap-1.5">
+            <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 ${isLight ? 'text-slate-400' : 'text-slate-500'}`}>
+              Emulators
+            </span>
+            <div className={`p-1 rounded-xl flex flex-col gap-1 border ${isLight ? 'bg-slate-100/70 border-slate-200/60' : 'bg-white/[0.03] border-white/[0.06]'
+              }`}>
+              <button
+                onClick={() => handleDeviceSelect('both')}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${deviceLayout === 'both'
                   ? isLight ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'bg-white/10 text-white font-medium'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
@@ -135,7 +177,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
               <Columns2 className="w-3.5 h-3.5 opacity-60" />
             </button>
             <button
-              onClick={() => setDeviceLayout('ios')}
+              onClick={() => handleDeviceSelect('ios')}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${deviceLayout === 'ios'
                   ? isLight ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'bg-white/10 text-white font-medium'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
@@ -145,7 +187,7 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
               <span className="text-[10px] opacity-60">iOS</span>
             </button>
             <button
-              onClick={() => setDeviceLayout('android')}
+              onClick={() => handleDeviceSelect('android')}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs transition-all ${deviceLayout === 'android'
                   ? isLight ? 'bg-white text-slate-900 font-semibold shadow-sm' : 'bg-white/10 text-white font-medium'
                   : isLight ? 'text-slate-600 hover:text-slate-900' : 'text-slate-400 hover:text-white'
@@ -253,5 +295,6 @@ export const FloatingSidebar: React.FC<FloatingSidebarProps> = ({
         )}
       </div>
     </aside>
+    </>
   );
 };

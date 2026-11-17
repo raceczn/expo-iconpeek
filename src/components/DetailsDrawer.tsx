@@ -31,32 +31,34 @@ export const DetailsDrawer: React.FC<DetailsDrawerProps> = ({ state, studioTheme
     }`}>
       {/* Bar handle */}
       <div 
-        className={`h-10 px-6 md:pl-[292px] flex items-center justify-between cursor-pointer ${
+        className={`h-10 px-4 md:pl-[292px] flex items-center justify-between cursor-pointer ${
           isLight ? 'hover:bg-slate-100/80' : 'hover:bg-white/[0.02]'
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-2 font-medium ${isLight ? 'text-slate-900' : 'text-white'}`}>
+        <div className="flex items-center gap-2 sm:gap-4 truncate mr-2">
+          <div className={`flex items-center gap-1.5 font-medium shrink-0 ${isLight ? 'text-slate-900' : 'text-white'}`}>
             <FileCode className="w-4 h-4 text-blue-500" />
-            <span>Project Diagnostics</span>
+            <span className="truncate">Diagnostics</span>
           </div>
 
           {hasWarnings ? (
-            <div className="flex items-center gap-1.5 text-amber-500 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
-              <AlertTriangle className="w-3.5 h-3.5" />
-              <span>{state.warnings.length} warning{state.warnings.length > 1 ? 's' : ''} detected</span>
+            <div className="flex items-center gap-1 text-amber-500 font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 truncate text-[11px]">
+              <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate">{state.warnings.length} warning{state.warnings.length > 1 ? 's' : ''}</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 text-emerald-500 font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>All assets resolved cleanly</span>
+            <div className="flex items-center gap-1 text-emerald-500 font-medium truncate text-[11px]">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span className="truncate hidden sm:inline">All assets resolved cleanly</span>
+              <span className="truncate sm:hidden">Clean</span>
             </div>
           )}
         </div>
 
-        <div className={`flex items-center gap-2 ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
-          <span>{isOpen ? 'Collapse Diagnostics' : 'Expand Diagnostics'}</span>
+        <div className={`flex items-center gap-1.5 shrink-0 text-[11px] sm:text-xs ${isLight ? 'text-slate-500' : 'text-slate-400'}`}>
+          <span className="hidden sm:inline">{isOpen ? 'Collapse Diagnostics' : 'Expand Diagnostics'}</span>
+          <span className="sm:hidden">{isOpen ? 'Collapse' : 'Details'}</span>
           {isOpen ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
         </div>
       </div>

@@ -12,7 +12,11 @@
         {
           "image": "./assets/iconpeek.png",
           "resizeMode": "contain",
-          "backgroundColor": "#0E1015"
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/iconpeek.png",
+            "backgroundColor": "#0E1015"
+          }
         }
       ]
     ],
