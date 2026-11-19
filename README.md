@@ -1,47 +1,125 @@
 # iconpeek
 
-`iconpeek` is a zero-dependency local preview server for Expo app branding. It solves the slow feedback loop of changing app config, rebuilding native shells, and reinstalling just to see whether your adaptive icon crop, iOS icon mask, or splash colors are in the right neighborhood.
+<p align="center">
+  <img src="assets/showcase/dual-mockup-light.png" alt="iconpeek Studio Dual Device Preview" width="100%" />
+</p>
 
-It is useful for React Native apps that use Expo config, including Expo-managed apps and many prebuild projects. Bare React Native support is not complete yet because native icon sources can live in Android resource folders, iOS asset catalogs, Gradle files, Xcode project settings, and third-party tooling.
+<p align="center">
+  <strong>Zero-dependency local preview studio for Expo app icons and splash screens.</strong>
+</p>
+
+`iconpeek` is a lightweight, zero-dependency npm package I created to solve a problem I often faced when developing React Native and Expo apps: checking how app icons would actually look on Android and iOS. Instead of changing the icon, rebuilding the app, and reinstalling it just to check the results, I built a local preview tool that lets developers see their app icons directly in the browser using their existing Expo configuration. Simply run `npx iconpeek` inside your Expo project to start the preview server.
+
+It includes previews for Android adaptive icons, different icon shapes, iOS home screen icons, app icon sizes, and light and dark splash screens. It also includes a Python-based icon generator that creates the required Android and iOS icon files. What started as a small tool to make my own development workflow easier became an npm package that helps other developers save time and avoid repeated builds when working on their app branding.
+
+<p align="center">
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#showcase">Showcase</a> •
+  <a href="#key-features">Key Features</a> •
+  <a href="#appjson-configuration">Configuration</a> •
+  <a href="#cli-flags">CLI Flags</a> •
+  <a href="#asset-generator-script">Asset Generator</a>
+</p>
+
+---
+
+## Showcase
+
+### 1. Dual Device Emulators (Light & Dark Studio)
+Test your branding simultaneously on an **iPhone 18 Pro Max** (iOS 18.2) and **Samsung Galaxy S24 Ultra** (One UI 6.1). Switch between Studio Light and Dark modes to match your preferred workspace aesthetic.
+
+| Studio Light Mode | Studio Dark Mode |
+| :---: | :---: |
+| <img src="assets/showcase/dual-mockup-light.png" alt="iconpeek Light Studio Mode" width="100%" /> | <img src="assets/showcase/dual-mockup-dark.png" alt="iconpeek Dark Studio Mode" width="100%" /> |
+
+---
+
+### 2. Interactive Splash Screen Simulation (Light & Dark Mode)
+Click on any app icon or select the **Splash Screen** view to preview your app's launching sequence. Toggle between **Light** and **Dark** splash modes with automatic status bar contrast calculation (dark status bar on light backgrounds, white on dark backgrounds).
+
+<p align="center">
+  <img src="assets/showcase/splash-screen-preview.png" alt="iconpeek Splash Screen Preview" width="90%" />
+</p>
+
+---
+
+### 3. Density & Size Comparison Matrix
+Inspect your branding assets across all essential operating system contexts and screen pixel densities in one glance:
+
+- **Android Densities (Adaptive & Legacy):** `mdpi` (48px), `hdpi` (72px), `xhdpi` (96px), `xxhdpi` (144px), and `xxxhdpi` (192px).
+- **iOS Scales & Contexts (`AppIcon.appiconset`):** Notification (40px), Settings (58px), Spotlight (80px), iPhone Home (120px), and iPhone Max (180px).
+
+<p align="center">
+  <img src="assets/showcase/size-matrix-preview.png" alt="iconpeek Size Matrix Preview" width="90%" />
+</p>
+
+---
+
+## Key Features
+
+- **📱 Dual Ultra-Realistic Device Mockups**
+  - **Apple iPhone 18 Pro Max (iOS 18.2):** Full Dynamic Island simulation, status bar icons, widgets, and iOS homescreen layout.
+  - **Samsung Galaxy S24 Ultra (One UI 6.1):** Edge-to-edge Infinity-O punch-hole cutout, One UI clock/weather widget, and Google search bar.
+
+- **🎨 Android Adaptive Icon Physics & Masks**
+  - **Parallax Tilt Simulation:** Move your mouse over the Galaxy S24 icon to inspect foreground/background layer separation and depth.
+  - **One-Click Mask Switching:** Switch between `Squircle`, `Circle`, `Rounded Rectangle`, `Square`, and `Teardrop` shapes.
+
+- **🌗 Splash Screen Light & Dark Preview**
+  - Seamless support for both `expo-splash-screen` config plugin and standard `expo.splash` definitions.
+  - Test independent light and dark background colors and image assets.
+  - Click anywhere on the splash screen or tap the bottom home bar to return to the homescreen.
+
+- **📐 Safe Zone & Crop Inspector**
+  - Inspect adaptive icons against the official Android 108dp canvas, 72dp viewport, 18dp crop margin, and 66dp safe zone.
+  - Verify that critical logo artwork never gets cropped off across different vendor masks.
+
+- **📊 Density & Size Comparison Matrix**
+  - Instant density checks across iOS App Store, notification, settings, spotlight, and Android mdpi through xxxhdpi.
+
+- **📲 Mobile-Responsive Studio**
+  - Fully responsive on mobile phones and tablets with slide-out drawer navigation, top action bar, and automatic viewport-fitting zoom.
+
+- **⚡ Hot Reload & Live Diagnostics**
+  - Connected via Server-Sent Events (SSE). Modifying `app.json` or updating image assets refreshes the preview immediately.
+  - Diagnostics drawer provides real-time feedback on mapped asset paths and configuration health warnings.
+
+---
 
 ## Quick Start
 
-Run this inside your Expo project:
+Run this single command inside any Expo project root:
 
 ```bash
 npx iconpeek
 ```
 
-You can also point it at another project root or choose a starting port:
+Or specify a custom project path or port:
 
 ```bash
-npx iconpeek --project /path/to/expo/app
-npx iconpeek --port 5000
+npx iconpeek --project /path/to/expo/app --port 5000
 ```
+
+---
 
 ## CLI Flags
 
-- `--project <path>`: Read `app.json`, `app.config.json`, or `app.config.js` from a different Expo project root.
-- `--port <number>`: Set the starting port. `iconpeek` defaults to `4200` and auto-increments if that port is already in use.
-- `--no-open`: Start the server without opening a browser window.
+| Flag | Default | Description |
+| :--- | :---: | :--- |
+| `--project <path>` | `.` | Target directory containing `app.json`, `app.config.json`, or `app.config.js`. |
+| `--port <number>` | `4200` | Starting port. Automatically increments if the port is already in use. |
+| `--no-open` | `false` | Start the local server without automatically opening the browser. |
 
-## What It Previews
+---
 
-- Android adaptive icon mask math using the 108dp canvas, 72dp viewport, 18dp crop margin, and 66dp safe zone used by adaptive icons
-- Android mask shape toggles for squircle, rounded rectangle, circle, and square
-- Android foreground-only parallax movement to simulate launcher depth
-- iOS icon preview with an approximate system rounded mask and transparency warning
-- Android launcher and iOS homescreen context previews with the selected app icon highlighted
-- Android and iOS size comparison rows for common system contexts
-- Splash screen previews for light and dark themes with automatic status bar contrast
+## `app.json` Configuration
 
-## `app.json` Field Mapping
-
-`iconpeek` reads these keys:
+`iconpeek` automatically reads your standard Expo configuration:
 
 ```json
 {
   "expo": {
+    "name": "My Great App",
     "icon": "./assets/icon.png",
     "android": {
       "adaptiveIcon": {
@@ -49,92 +127,73 @@ npx iconpeek --port 5000
         "backgroundColor": "#FFFFFF"
       }
     },
-    "splash": {
-      "image": "./assets/splash.png",
-      "imageWidth": 160,
-      "backgroundColor": "#FFFFFF",
-      "dark": {
-        "image": "./assets/splash-dark.png",
-        "backgroundColor": "#121212"
-      }
-    }
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#FFFFFF",
+          "dark": {
+            "image": "./assets/splash-dark.png",
+            "backgroundColor": "#121212"
+          }
+        }
+      ]
+    ]
   }
 }
 ```
 
-If the config file is missing or any asset path does not exist, `iconpeek` falls back to `assets/placeholder-icon.png` and shows a warning in the UI instead of crashing.
+> [!TIP]
+> If your project uses the legacy `expo.splash` object instead of `plugins`, `iconpeek` supports that as well.
 
-For `app.config.js`, `iconpeek` loads the local config module directly. That matches normal Expo expectations, but it also means config code can run. `module.exports = {...}` and `module.exports = ({ config }) => ({...})` always work. `export default` (ES module syntax) works automatically on Node 20.19+ or 22.12+, since those versions added native `require(esm)` support — on older Node (this package's declared floor is 14), it fails with an explicit error telling you to upgrade Node, convert the file to CommonJS, or use `app.json`/`app.config.json` instead.
+---
 
-## `generate_icons.py` Usage
+## Asset Generator Script (`generate_icons.py`)
 
-Install the only Python dependency:
+A standalone icon generator script is bundled to produce production-ready Android and iOS icon sets from a single high-resolution master image (1024x1024 PNG).
 
+### Prerequisites:
 ```bash
 pip install Pillow
 ```
 
-Basic usage:
-
+### Basic Usage:
 ```bash
-python generate_icons.py --source icon-1024.png --out ./icon_output
+python generate_icons.py --source master-icon.png --out ./icon_output
 ```
 
-All supported flags:
-
+### Advanced Usage with Custom Layers:
 ```bash
 python generate_icons.py \
-  --source icon-1024.png \
+  --source master-icon.png \
   --out ./icon_output \
-  --android-fg adaptive-fg.png \
-  --android-bg "#F5A623" \
-  --ios-source ios-flat.png
+  --android-fg ./assets/adaptive-fg.png \
+  --android-bg "#0E1015" \
+  --ios-source ./assets/ios-icon.png
 ```
 
-Flags:
+### Generated Outputs:
+* **Android:** Legacy mipmap densities (`mdpi` through `xxxhdpi`), `mipmap-anydpi-v26` adaptive XML configs, and 512x512 Google Play Store graphic.
+* **iOS:** Complete `AppIcon.appiconset` with properly formatted `Contents.json` covering iPhone and iPad idiom sizes.
 
-- `--source`: Required base icon image used for Android legacy icons and, by default, every other output.
-- `--out`: Output directory. Defaults to `./icon_output`.
-- `--android-fg`: Optional dedicated Android adaptive foreground asset.
-- `--android-bg`: Optional Android adaptive icon background color. Defaults to `#FFFFFF`.
-- `--ios-source`: Optional alternate flat source used only for iOS icons.
+---
 
-The generator creates:
+## Development & Testing
 
-- Android legacy launcher icons per density
-- Android adaptive foreground and background layers plus `mipmap-anydpi-v26` XML files. Foreground content is sized to the standard 72dp area on the 108dp canvas (matching Android Studio's Image Asset Studio default), not shrunk down to the 66dp safe-zone diameter — that diameter is the guaranteed-visible region, not a target canvas size for your artwork.
-- A 512x512 Play Store icon flattened onto white
-- A complete iOS `AppIcon.appiconset` with `Contents.json`, including both `iphone` and `ipad` idiom entries at every shared point size (20/29/40pt), not just iPhone sizes
-
-The script warns when a source image is not square or is smaller than `1024x1024`.
-
-## Testing
-
+Run unit & smoke test suite:
 ```bash
 npm test
-# or: bash tests/smoke-test.sh
 ```
 
-This boots the real server against a set of fixture Expo projects (missing config, malformed JSON, `splash.imageWidth` set, 8-digit hex colors, a path-traversal attempt, an `app.config.js` using `export default`, and a fully-populated project) and checks actual HTTP responses — status codes, content types, warning text, and CLI argument validation.
-
-It also statically diffs every `document.getElementById(...)` call in the rendered page against every `id="..."` attribute actually present, so a client-side id typo fails the suite immediately instead of only breaking in a browser on a specific config shape. `generate_icons.py` output is checked structurally too: iOS idiom coverage, Android adaptive-icon foreground sizing, and the embedded placeholder asset all get inspected, not just "did it exit 0."
-
-## Publishing To npm
-
-For contributors publishing a new release:
-
+Build production client assets:
 ```bash
-npm test
-npm version patch
-npm publish
+npm run build
 ```
 
-Make sure `server.js`, `generate_icons.py`, `README.md`, `LICENSE`, and `assets/` are included in the package before publishing.
+---
 
-## Contributing
+## License
 
-Ideas for future additions:
-
-- Bare React Native config path support outside Expo
-- Android 13 monochrome icon preview and export
-- watchOS and additional Apple platform icon size generation
+MIT © [IconPeek](https://github.com/raceczn/expo-iconpeek)
